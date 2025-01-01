@@ -1,0 +1,19 @@
+modules:
+  jira:issuePanel:
+    - key: claude-issue-summarizer-hello-world-issue-panel
+      resource: main
+      resolver:
+        function: resolver
+      render: native
+      title: Claude-Issue-summarizer
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+app:
+  runtime:
+    name: nodejs22.x
+  id: ari:cloud:ecosystem::app/fe6b4677-09ee-49a0-8651-8d01d3104d02
