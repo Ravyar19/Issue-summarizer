@@ -129,4 +129,47 @@ async function generateClaudeSummary(description) {
   }
 }
 
+resolver.define("generateSummary", async ({ context }) => {
+  const issueKey = context.extension.issue.key;
+  try {
+    const issueDetails = await getIssueDetails(issueKey);
+    const descriptionField = issueDetails.fields.description;
+
+    if (!descriptionField || descriptionField.type !== "doc") {
+      console.log(
+        "Description is invalid or not in ProseMirror format:",
+        descriptionField
+      );
+      return "No description available for summarization."; // Return plain string
+    }
+
+    if (!descriptionField.content || !Array.isArray(descriptionField.content)) {
+      console.log(
+        "Description content is missing or invalid:",
+        descriptionField.content
+      );
+      return "No meaningful content found in the description.";
+    }
+
+    const descriptionText = extractTextFromProseMirror(
+      descriptionField.content
+    );
+
+    if (!descriptionText.trim()) {
+      return "No meaningful text found in the description.";
+    }
+
+    const summary = await generateClaudeSummary(descriptionText);
+    if (!summary || typeof summary !== "string") {
+      console.error();
+      console.error("Claude API returned invalid summary:", summary);
+      throw new Error("Claude API did not generate a valid summary.");
+    }
+    return summary;
+  } catch (error) {
+    console.error("Error in generateSummary:", error);
+    return "Failed to generate summary due to an error.";
+  }
+});
+
 export const handler = resolver.getDefinitions();
