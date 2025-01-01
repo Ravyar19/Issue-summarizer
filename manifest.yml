@@ -13,6 +13,10 @@ modules:
 resources:
   - key: main
     path: src/frontend/index.jsx
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
 app:
   runtime:
     name: nodejs22.x
