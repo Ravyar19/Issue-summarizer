@@ -172,4 +172,22 @@ resolver.define("generateSummary", async ({ context }) => {
   }
 });
 
+resolver.define("applySummary", async ({ payload, context }) => {
+  const { summary } = payload;
+
+  const issueKey = context.extension.issue.key;
+  if (!summary || typeof summary !== "string" || !summary.trim()) {
+    throw new Error("Invalid or empty summary provided");
+  }
+
+  try {
+    console.log("Attempting to update summary:", summary);
+    await updateIssueSummary(issueKey, summary.trim());
+    return { success: true, message: "Summary updated successfully" };
+  } catch (error) {
+    console.error("Error in applySummary:", error);
+    throw error;
+  }
+});
+
 export const handler = resolver.getDefinitions();
