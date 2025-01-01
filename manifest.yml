@@ -17,6 +17,10 @@ permissions:
   scopes:
     - read:jira-work
     - write:jira-work
+  external:
+    fetch:
+      backend:
+        - "https://api.anthropic.com/v1/completions"
 app:
   runtime:
     name: nodejs22.x

@@ -74,4 +74,59 @@ function extractTextFromProseMirror(proseMirrorContent) {
     .join("\n");
 }
 
+async function generateClaudeSummary(description) {
+  if (!description || typeof description !== "string") {
+    throw new Error("Invalid description provided");
+  }
+
+  try {
+    console.log("Generating summary using claude");
+
+    const anthropicApiKey = process.env.CLAUDE_API_KEY;
+
+    const payload = {
+      model: "claude-3-5-sonnet-20241022",
+      messages: [
+        {
+          role: "user",
+          content: `Summarize the following jira issue description: ${description}`,
+        },
+      ],
+      max_tokens: 256,
+      stream: false,
+    };
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+        "x-api-key": anthropicApiKey,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      console.error("Error from claude api:", errorDetails);
+      throw new Error(`Claude API Error: ${errorDetails}`);
+    }
+    const data = await response.json();
+    console.log("Claude API response:", data);
+    // Extract text from the content array
+    const summary = data.content
+      ?.map((item) => (item.type === "text" ? item.text : ""))
+      .join("\n")
+      .trim();
+
+    if (!summary) {
+      throw new Error("Did not generate valid summary");
+    }
+    return summary;
+  } catch (error) {
+    console.error("Error generating summary", error);
+    throw new Error("Failed to generate summary using claude");
+  }
+}
+
 export const handler = resolver.getDefinitions();
