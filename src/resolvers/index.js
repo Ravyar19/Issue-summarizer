@@ -57,4 +57,21 @@ async function updateIssueSummary(issueKey, summary) {
   }
 }
 
+function extractTextFromProseMirror(proseMirrorContent) {
+  if (!proseMirrorContent || !Array.isArray(proseMirrorContent)) {
+    return "";
+  }
+
+  return proseMirrorContent
+    .map((node) => {
+      if (node.type === "paragraph" && node.content) {
+        return node.content
+          .map((child) => (child.type === "text" ? child.text : ""))
+          .join("");
+      }
+      return "";
+    })
+    .join("\n");
+}
+
 export const handler = resolver.getDefinitions();
