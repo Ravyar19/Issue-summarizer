@@ -39,7 +39,21 @@ async function updateIssueSummary(issueKey, summary) {
         },
         body: JSON.stringify({
           fields: {
-            summary: summary.trim(),
+            description: {
+              type: "doc",
+              version: 1,
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: summary.trim(),
+                    },
+                  ],
+                },
+              ],
+            },
           },
         }),
       });
